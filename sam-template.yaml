@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  SnackTable:
+    Type: AWS::Serverless::SimpleTable
+  Snacks:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs8.10
+      CodeUri: ./api
+      Handler: snacks.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref SnackTable
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        AddSnack:
+          Type: Api
+          Properties:
+            Path: /snacks
+            Method: post
+        ListSnacks:
+          Type: Api
+          Properties:
+            Path: /snacks
+            Method: get
+        Snack:
+          Type: Api
+          Properties:
+            Path: /snacks/{id}
+            Method: any
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+      AllowHeaders: "'*'"
+      AllowOrigin: "'*'"
