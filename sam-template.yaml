@@ -8,6 +8,19 @@ Resources:
     Properties:
       Runtime: nodejs8.10
       CodeUri: ./api
+      AutoPublishAlias: live
+
+      DeploymentPreference:
+        Type: Canary10Percent10Minutes 
+        # Alarms:
+        #  # A list of alarms that you want to monitor
+        #   - !Ref AliasErrorMetricGreaterThanZeroAlarm
+        #   - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+        # Hooks:
+        #  # Validation Lambda functions that are run before & after traffic shifting
+        #   PreTraffic: !Ref PreTrafficLambdaFunction
+        #   PostTraffic: !Ref PostTrafficLambdaFunction
+
       Handler: snacks.handler
       Environment:
         Variables:
