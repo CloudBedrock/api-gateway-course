@@ -175,6 +175,12 @@ exports.handler = (event, context, callback) => {
 		// all other http methods default with error message of unsupported
 		default:
 			const message = `Unsupported HTTP method ${event.httpMethod}`;
-			createResponse(message, null, callback);
+				callback(null, {
+							statusCode: 400,
+							headers: {
+								"Access-Control-Allow-Origin": "*"
+							},
+							body: JSON.stringify({ error: message })
+						});
 	}
 };
