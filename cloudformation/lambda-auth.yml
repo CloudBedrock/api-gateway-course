@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  LambdaExecutionRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies: 
+        - 
+          PolicyName: "root"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: 'arn:aws:logs:*:*:*'
+              -
+                Effect: "Allow"
+                Action:
+                  - "xray:PutTraceSegments"
+                  - "xray:PutTelemetryRecords"
+                Resource: "*"
+  LambdaAuth: 
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      Handler: "index.handler"
+      Runtime: "nodejs8.10"
+      Timeout: 25
+      TracingConfig:
+        Mode: "Active"
+      Role: 
+        Fn::GetAtt: 
+          - "LambdaExecutionRole"
+          - "Arn"
+      Code: 
+        ZipFile: >
+          exports.handler =  function(event, context, callback) {
+          var token = event.authorizationToken;
+              switch (token.toLowerCase()) {
+                  case 'allow':
+                      callback(null, generatePolicy('user', 'Allow', event.methodArn));
+                      break;
+                  case 'deny':
+                      callback(null, generatePolicy('user', 'Deny', event.methodArn));
+                      break;
+                  case 'unauthorized':
+                      callback("Unauthorized");   // Return a 401 Unauthorized response
+                      break;
+                  default:
+                      callback("Error: Invalid token"); 
+              }
+          };
+                    // Help function to generate an IAM policy
+          var generatePolicy = function(principalId, effect, resource) {
+              var authResponse = {};
+              
+              authResponse.principalId = principalId;
+              if (effect && resource) {
+                  var policyDocument = {};
+                  policyDocument.Version = '2012-10-17'; 
+                  policyDocument.Statement = [];
+                  var statementOne = {};
+                  statementOne.Action = 'execute-api:Invoke'; 
+                  statementOne.Effect = effect;
+                  statementOne.Resource = resource;
+                  policyDocument.Statement[0] = statementOne;
+                  authResponse.policyDocument = policyDocument;
+              }
+              
+              // Optional output with custom properties of the String, Number or Boolean type.
+              authResponse.context = {
+                  "stringKey": "stringval",
+                  "numberKey": 123,
+                  "booleanKey": true
+              };
+              return authResponse;
+          };
