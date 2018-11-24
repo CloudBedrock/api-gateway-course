@@ -18,7 +18,4 @@ In this Module, we'll be utilizing Amazon Api Gateway in a Service Proxy mode fr
 
 [<img src="./images/cloudformation-launch-stack.png"
      alt="Cloud Formation Launch Stack with SQS Proxy"
-     style="float: left; margin-right: 10px;" />](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=Kinesis-Proxy&templateURL=https://s3.amazonaws.com/cloudbedrock-artifacts/kinesis-proxy.yml
-
-)
-
+     style="float: left; margin-right: 10px;" />](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=Kinesis-Proxy&templateURL=https://s3.amazonaws.com/cloudbedrock-artifacts/kinesis-proxy.yml)
